@@ -1,14 +1,16 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import config from '../../config';
 import multer from 'multer';
 import fs from 'fs';
-
 
 cloudinary.config({
   cloud_name: 'daumdhnzd',
   api_key: config.cloudinary_api_key,
   api_secret: config.cloudinary_api_secret,
 });
+
+const cloudinaryUpload = cloudinary;
 
 export const sendImageTocloudinary = (imageName: string, path: string) => {
   return new Promise((resolve, reject) => {
@@ -23,22 +25,30 @@ export const sendImageTocloudinary = (imageName: string, path: string) => {
         }
         resolve(result);
         fs.unlink(path, function (err) {
-          if (err) return err
-         
+          if (err) return err;
         });
       },
     );
   });
 };
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, process.cwd() + '/uploads/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname + '-' + uniqueSuffix);
-  },
+const removeExtension = (filename: string) => {
+  return filename.split('.').slice(0, -1).join('.');
+};
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinaryUpload,
+  params: async (_req, file) => ({
+    folder: 'uploads', // Optional: Store in a specific folder
+    public_id:
+      Math.random().toString(36).substring(2) +
+      '-' +
+      Date.now() +
+      '-' +
+      file.fieldname +
+      '-' +
+      removeExtension(file.originalname),
+  }),
 });
 
 export const upload = multer({ storage: storage });

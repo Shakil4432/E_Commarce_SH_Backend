@@ -1,22 +1,27 @@
+import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../error/AppError';
-import { sendImageTocloudinary } from '../utils/sendImageToCloudinary';
 import { searchAbleFields } from './product.constant';
 import { TProduct } from './product.interface';
 import { Product } from './product.model';
 import httpStatus from 'http-status';
+import { IImageFiles } from '../interface/IImageFile';
 
-const createProductIntoDB = async (file: any, payload: TProduct) => {
-  if (!file?.path) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'File is required');
+const createProductIntoDB = async (
+  productImages: IImageFiles,
+  productData: Partial<TProduct>,
+
+  userId: string,
+) => {
+  const { files } = productImages;
+  if (!files || files.length === 0) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Product images are required.');
   }
 
-  const imageName = payload.name;
-  const { secure_url }: any = await sendImageTocloudinary(imageName, file.path);
+  productData.images = files.map((image) => image.path);
+  productData.userID = new mongoose.Types.ObjectId(userId);
 
-  payload.image = secure_url;
-
-  const result = await Product.create(payload);
+  const result = await Product.create(productData);
   return result;
 };
 
@@ -73,10 +78,59 @@ const deleteProductFromDB = async (id: string) => {
   return result;
 };
 
+const getProductsByUserID = async (
+  userId: string,
+  query: Record<string, unknown>,
+) => {
+  const ProductsQuery = new QueryBuilder(
+    Product.find({ userID: userId }),
+    query,
+  )
+    .search(searchAbleFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+  const meta = await ProductsQuery.countTotal();
+  const result = await ProductsQuery.modelQuery;
+  console.log(meta, result);
+
+  return {
+    meta,
+    result,
+  };
+};
+
+const getSalesByUserID = async (
+  userId: string,
+  query: Record<string, unknown>,
+) => {
+  const SalesQuery = new QueryBuilder(
+    Product.find({
+      $and: [{ userID: userId }, { status: 'sold' }],
+    }),
+    query,
+  )
+    .search(searchAbleFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+  const meta = await SalesQuery.countTotal();
+  const result = await SalesQuery.modelQuery;
+
+  return {
+    meta,
+    result,
+  };
+};
+
 export const ProductServices = {
   createProductIntoDB,
   getAllProductsFromDB,
   getSingleProductFromDB,
   updateProductIntoDB,
   deleteProductFromDB,
+  getProductsByUserID,
+  getSalesByUserID,
 };

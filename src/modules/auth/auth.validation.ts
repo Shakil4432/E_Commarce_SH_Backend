@@ -9,9 +9,17 @@ const loginValidationSchema = z.object({
 
 const registrationUserValidation = z.object({
   body: z.object({
-    name:z.string({required_error:"Name is required"}),
-    email: z.string({ required_error: 'Email is required' }),
-    password: z.string({ required_error: 'Password is required' }),
+    name: z.string().min(1, { message: 'Name is required' }),
+    email: z.string().email({ message: 'Invalid email address' }),
+    number: z
+      .string()
+      .min(10, { message: 'Phone number must be at least 10 digits' })
+      .max(15, { message: 'Phone number must be at most 15 digits' }),
+    password: z
+      .string()
+      .min(8, { message: 'Password must be at least 8 characters' }),
+    role: z.enum(['user', 'admin']).optional().default('user'),
+    isBlocked: z.boolean().optional().default(false),
   }),
 });
 

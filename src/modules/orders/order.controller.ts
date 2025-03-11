@@ -3,16 +3,20 @@ import { sendResponse } from '../utils/sendResponse';
 import { OrderServices } from './order.service';
 
 export const createOrder = CatchAsync(async (req, res) => {
-
   const user = req.user;
-  
+
   console.log(user);
-  const order = await OrderServices.createOrderIntoDB(req.body, user?.id,req.ip!);
+  const order = await OrderServices.createOrderIntoDB(
+    req.body,
+    user?.id,
+    req.ip!,
+  );
+  console.log(order);
   sendResponse(res, {
     success: true,
     message: 'Order created successfully',
     statusCode: 201,
-    data: order
+    data: order,
   });
 });
 
@@ -21,28 +25,26 @@ const verifyPayment = CatchAsync(async (req, res) => {
 
   sendResponse(res, {
     statusCode: 200,
-    message: "Order verified successfully",
+    message: 'Order verified successfully',
     data: order,
-    success:true
+    success: true,
   });
 });
 
 const getOrders = CatchAsync(async (req, res) => {
-  const email = req.params.email
+  const email = req.params.email;
   const order = await OrderServices.getOrders(email);
 
   sendResponse(res, {
     statusCode: 200,
-    message: "Order retrieved successfully",
+    message: 'Order retrieved successfully',
     data: order,
-    success:true
+    success: true,
   });
 });
-
-
 
 export const OrderControllers = {
   createOrder,
   verifyPayment,
-  getOrders
+  getOrders,
 };

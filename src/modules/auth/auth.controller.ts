@@ -10,13 +10,14 @@ const registrationUser = CatchAsync(async (req, res) => {
     httpOnly: true,
   });
 
-  console.log(result)
+  console.log(result);
   sendResponse(res, {
     success: true,
     message: 'User Registration successful',
     statusCode: 200,
     data: {
       token: result.accessToken,
+      refreshToken: result.refreshToken,
     },
   });
 });
@@ -34,6 +35,7 @@ const loginUser = CatchAsync(async (req, res) => {
     statusCode: 200,
     data: {
       token: result.accessToken,
+      refreshToken: result.refreshToken,
     },
   });
 });

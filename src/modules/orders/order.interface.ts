@@ -18,5 +18,5 @@ export type TOrders = {
     method: string;
     date_time: string;
   };
-  status?: 'pending' | 'shipped' | 'paid' | 'completed' | 'cancelld';
+  status?: 'pending' | 'shipped' | 'paid' | 'completed' | 'cancelled';
 };

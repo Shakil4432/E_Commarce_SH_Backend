@@ -1,6 +1,5 @@
 import { FilterQuery, Query } from 'mongoose';
 
-
 class QueryBuilder<T> {
   public modelQuery: Query<T[], T>;
   public query: Record<string, unknown>;
@@ -21,8 +20,6 @@ class QueryBuilder<T> {
     }
     return this;
   }
-  
-
 
   filter() {
     const queryObj = { ...this.query };
@@ -41,10 +38,9 @@ class QueryBuilder<T> {
 
   paginate() {
     const page = Number(this.query?.page) || 1;
-    const limit = Number(this.query?.limit) || 10;
+    const limit = Number(this.query?.limit);
     const skip = (page - 1) * limit;
 
-    
     this.modelQuery = this.modelQuery.skip(skip).limit(limit);
     return this;
   }

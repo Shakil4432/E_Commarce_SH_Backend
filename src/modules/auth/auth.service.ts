@@ -14,24 +14,23 @@ const userRegistration = async (payload: TLoginUser) => {
     throw new AppError(httpStatus.BAD_REQUEST, 'You have already registered');
   }
 
-  
-  const newUser = await User.create(payload); 
+  const newUser = await User.create(payload);
 
   const jwtPayload = {
-    email: newUser.email, 
-    role: newUser.role,  
+    email: newUser.email,
+    role: newUser.role,
   };
 
   const accessToken = createToken(
     jwtPayload,
     config.jwt_secret_key as string,
-    '10d'
+    '10d',
   );
 
   const refreshToken = createToken(
     jwtPayload,
     config.jwt_refresh_key as string,
-    '365d'
+    '365d',
   );
 
   return {
@@ -39,9 +38,6 @@ const userRegistration = async (payload: TLoginUser) => {
     refreshToken,
   };
 };
-
-
-
 
 const loginUser = async (payload: TLoginUser) => {
   const user = await User.isUserExist(payload?.email);
@@ -57,6 +53,7 @@ const loginUser = async (payload: TLoginUser) => {
   const jwtPayload = {
     email: user?.email,
     role: user?.role,
+    id: user?._id,
   };
 
   const accessToken = createToken(

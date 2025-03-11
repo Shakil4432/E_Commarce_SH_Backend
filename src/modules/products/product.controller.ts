@@ -1,13 +1,18 @@
+import { IImageFiles } from '../interface/IImageFile';
 import CatchAsync from '../utils/CatchAsync';
 import { sendResponse } from '../utils/sendResponse';
 import { ProductServices } from './product.service';
 
 const createProduct = CatchAsync(async (req, res) => {
- 
-  const result = await ProductServices.createProductIntoDB(req.file, req.body);
+  console.log(req.user?.id);
+  const result = await ProductServices.createProductIntoDB(
+    req.files as IImageFiles,
+    req.body,
+    req.user?.id,
+  );
   sendResponse(res, {
     success: true,
-    message: 'Book created successfully',
+    message: 'Product created successfully',
     statusCode: 201,
     data: result,
   });
@@ -35,8 +40,9 @@ const getSingleProduct = CatchAsync(async (req, res) => {
 });
 
 const updateProduct = CatchAsync(async (req, res) => {
+  console.log(req.body);
   const { id } = req.params;
-  const result = await ProductServices.updateProductIntoDB(id,  req.body);
+  const result = await ProductServices.updateProductIntoDB(id, req.body);
   sendResponse(res, {
     success: true,
     message: 'Product updated successfully',
@@ -55,10 +61,36 @@ const deleteProduct = CatchAsync(async (req, res) => {
   });
 });
 
+const getProductsByUserID = CatchAsync(async (req, res) => {
+  const userId = req?.user?.id;
+  console.log(userId);
+  const result = await ProductServices.getProductsByUserID(userId, req.query);
+  sendResponse(res, {
+    success: true,
+    message: 'Products retrieved successfully',
+    statusCode: 200,
+    data: result,
+  });
+});
+
+const getSalesByUserID = CatchAsync(async (req, res) => {
+  const userId = req?.user?.id;
+  console.log(userId);
+  const result = await ProductServices.getSalesByUserID(userId, req.query);
+  sendResponse(res, {
+    success: true,
+    message: 'Products retrieved successfully',
+    statusCode: 200,
+    data: result,
+  });
+});
+
 export const ProductControllers = {
   createProduct,
   getAllProduct,
   getSingleProduct,
   updateProduct,
   deleteProduct,
+  getProductsByUserID,
+  getSalesByUserID,
 };

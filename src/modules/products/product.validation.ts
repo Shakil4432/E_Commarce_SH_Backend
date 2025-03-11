@@ -7,10 +7,23 @@ const productValidationSchema = z.object({
       .string()
       .min(10, 'Description must be at least 10 characters long'),
     price: z.number().positive('Price must be a positive number'),
-    condition: z.enum(['New', 'Used']),
-    category: z.string(),
-    images: z.array(z.string().url().or(z.string())),
-    userID: z.string().min(1, 'User ID is required'),
+    status: z.enum(['sold', 'available']).optional().default('available'),
+    condition: z.enum(['new', 'used']).optional().default('used'),
+
+    category: z
+      .enum([
+        'Mobile Phones & Accessories',
+        'Electronics & Gadgets',
+        'Clothing & Fashion',
+        'Home & Garden',
+        'Sports & Outdoors',
+        'Books & Magazines',
+        'Toys & Hobbies',
+        'Pet Supplies',
+        'Health & Beauty',
+        'Other',
+      ])
+      .optional(),
   }),
 });
 
@@ -25,8 +38,8 @@ const updateProductValidationSchema = z.object({
       .min(10, 'Description must be at least 10 characters long')
       .optional(),
     price: z.number().positive('Price must be a positive number').optional(),
-    condition: z.enum(['New', 'Used']).optional(),
-    category: z.string().optional(),
+    condition: z.enum(['new', 'used']).optional(),
+
     images: z.array(z.string().url().or(z.string())).optional(),
     userID: z.string().min(1, 'User ID is required').optional(),
   }),
