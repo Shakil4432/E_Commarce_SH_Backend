@@ -24,7 +24,7 @@ app.use('/api/admin', AdminRoutes);
 app.use('/api/order', OrderRoutes);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Book Shop server running');
+  res.send('SIA server running');
 });
 
 app.use(globalErrorHandler);
